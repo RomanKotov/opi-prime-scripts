@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+MUSIC_DIR=${MUSIC_DIR:-'./music/'}
+
+COMMANDS_FILE=${COMMANDS_FILE:-'./commands'}
+
+STATUS_FILE=${STATUS_FILE:-'./status'}
+
+RANDOM_MP3=`find $MUSIC_DIR -type f -ipath '*/*.mp3' | sort -R | sed -n '1p'`
+
+FILENAME="${1:-$RANDOM_MP3}"
+
 INITIAL_STATUS_FILE_DATA=$(cat <<END
 P 0
 F 0 0 0 0
@@ -21,33 +31,30 @@ SED_SCRIPT=$(cat <<END
 END
 )
 
-STATUS_FILE=${STATUS_FILE:-'./status'}
-
 clear_status () {
   echo "$INITIAL_STATUS_FILE_DATA" > $STATUS_FILE
 }
 
 clear_status
 
-MUSIC_DIR=${MUSIC_DIR:-'./music'}
-
 if [[ ! -d $MUSIC_DIR ]]; then
   mkdir -p $MUSIC_DIR
 fi
-
-RANDOM_MP3=`find $MUSIC_DIR -type f -path '*/*.mp3' | sort -R | sed -n '1p'`
-
-FILENAME="${1:-$RANDOM_MP3}"
-
-COMMANDS_FILE=${COMMANDS_FILE:-'./commands'}
 
 if [[ ! -p $COMMANDS_FILE ]]; then
   mkfifo $COMMANDS_FILE
 fi
 
-trap 'rm $COMMANDS_FILE; clear_status; kill -- -$$' EXIT
+set_filename () {
+  file_path=${1#$"$MUSIC_DIR"}
+  printf "0a\nNOW_PLAYING '$file_path'\n.\nw\n" \
+  | ed -s $STATUS_FILE
+}
+
+trap 'rm $COMMANDS_FILE; clear_status; set_filename "n/a"; kill -- -$$' EXIT
 
 (
+  set_filename $FILENAME
   tail -f $COMMANDS_FILE \
   | mpg123 -R -remote-err &> >(
     while read line; do
@@ -59,12 +66,12 @@ trap 'rm $COMMANDS_FILE; clear_status; kill -- -$$' EXIT
     done
   ) \
   | tee /dev/tty \
-  | sed -u -n -E "$SED_SCRIPT"\
+  | sed -u -n -E "$SED_SCRIPT" \
   | ed -s $STATUS_FILE
 ) &
 
 PLAYER_PID=$!
 
-echo "load $FILENAME" >> $COMMANDS_FILE
+echo "LOAD $FILENAME" >> $COMMANDS_FILE
 
 wait $PLAYER_PID
