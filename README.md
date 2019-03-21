@@ -9,7 +9,7 @@ Dumps are printed to stdout and saved to './dump/' folder.
 
 It also accepts keyboard input to send to device.
 
-#Example: `./timestamp.sh /dev/ttyUSB0 9600`.
+Example: `./timestamp.sh /dev/ttyUSB0 9600`.
 
 ## Simple command line player `(cd player && ./player.sh)`
 
@@ -22,3 +22,11 @@ Real time status available at `player/status`.
 Accepts [remote commands for `mpg123`](https://github.com/georgi/mpg123/blob/master/doc/README.remote) via `player/commands` FIFO. For example: `echo "PAUSE" > commands` or `echo "P" > commands`
 
 General usage `./player.sh` or `./player.sh "./PATH_TO_FILE.mp3"`
+
+## Simple command line playlist player
+
+Depends on `mpg123`. It can be installed with `sudo apt install mpg123`.
+
+Plays random mp3 file (or online radio URL) from `radio/playlist` file (available after first launch).
+
+General usage `./radio.sh` or `./radio.sh "./PATH_TO_FILE.mp3"`

@@ -54,9 +54,9 @@ set_filename () {
 trap 'rm $COMMANDS_FILE; clear_status; set_filename "n/a"; kill -- -$$' EXIT
 
 (
-  set_filename $FILENAME
+  set_filename "$FILENAME"
   tail -f $COMMANDS_FILE \
-  | mpg123 -R -remote-err &> >(
+  | mpg123 -R -T -remote-err &> >(
     while read line; do
       echo $line
       if [[ "$line" == '@P 0' ]]; then
@@ -65,7 +65,6 @@ trap 'rm $COMMANDS_FILE; clear_status; set_filename "n/a"; kill -- -$$' EXIT
       fi
     done
   ) \
-  | tee /dev/tty \
   | sed -u -n -E "$SED_SCRIPT" \
   | ed -s $STATUS_FILE
 ) &
