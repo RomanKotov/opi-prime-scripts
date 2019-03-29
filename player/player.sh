@@ -6,7 +6,7 @@ COMMANDS_FILE=${COMMANDS_FILE:-'./commands'}
 
 STATUS_FILE=${STATUS_FILE:-'./status'}
 
-RANDOM_MP3=`find $MUSIC_DIR -type f -ipath '*/*.mp3' | sort -R | sed -n '1p'`
+RANDOM_MP3=`find $MUSIC_DIR -not -path '*/\.*' -type f -ipath '*/*.mp3' | sort -R | sed -n '1p'`
 
 FILENAME="${1:-$RANDOM_MP3}"
 

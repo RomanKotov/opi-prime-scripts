@@ -16,6 +16,7 @@ Example: `./timestamp.sh /dev/ttyUSB0 9600`.
 Depends on `mpg123`. It can be installed with `sudo apt install mpg123`.
 
 Plays random mp3 file from `player/music` folder (available after first launch).
+If file or directory is hidden (starts with dot, for example '.SomeFile.mp3' it will be omitted.
 
 Real time status available at `player/status`.
 
